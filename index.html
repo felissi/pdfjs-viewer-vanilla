@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <div id="toolbar">
+        <button id="prev">Previous</button>
+        <span id="page-info"
+          >Page <span id="page-num"></span> / <span id="page-count"></span
+        ></span>
+        <button id="next">Next</button>
+        <button id="zoom-in">Zoom In</button>
+        <button id="zoom-out">Zoom Out</button>
+        <button id="highlight">Highlight</button>
+      </div>
+
+      <div
+        id="viewerContainer"
+        tabindex="0"
+      >
+        <div
+          id="viewer"
+          class="pdfViewer"
+        ></div>
+      </div>
+    </div>
+    <script
+      type="module"
+      src="src/index.ts"
+    ></script>
+  </body>
+</html>
