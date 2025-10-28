@@ -113,9 +113,42 @@ GlobalWorkerOptions.workerSrc = pdfjsWorker;
     //   mode: AnnotationEditorType.HIGHLIGHT,
     // });
 
-    pdf.annotationStorage.setValue("previous_save_0");
-    pdf.annotationStorage.ser;
+    const annotation = {
+      subtype: "Highlight",
+      rect: [100, 700, 300, 720], // [x1, y1, x2, y2] in PDF coords
+      quadPoints: [
+        // REQUIRED for text highlights
+        100, 720, 300, 720, 300, 700, 100, 700,
+      ],
+      color: { r: 255, g: 255, b: 0 }, // RGB
+      opacity: 0.4,
+      contents: "Important text",
+      author: "User",
+      creationDate: new Date(),
+    };
+
+    pdf.annotationStorage.setValue("test", annotation);
+    // pdf.annotationStorage.updateEditor('test')
   });
+
+  document.getElementById("save")!.addEventListener(
+    "click",
+    () => {
+      pdf.saveDocument().then((_) => {
+        const blob = new Blob([_], { type: "application/pdf" });
+        const a = document.createElement("a");
+        const link = URL.createObjectURL(blob);
+        a.href = link;
+        a.download = "test.pdf";
+        a.click();
+        setTimeout(() => {
+          URL.revokeObjectURL(blob);
+          a.remove();
+        });
+      });
+    },
+    { passive: true }
+  );
 
   eventBus.dispatch("find", { type: "", query: "Just" });
 })();
