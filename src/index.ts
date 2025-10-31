@@ -5,6 +5,8 @@ import {
   AnnotationEditorType,
   AnnotationLayer,
   AnnotationMode,
+  AnnotationEditorLayer,
+  AnnotationEditorUIManager,
 } from "pdfjs-dist";
 import {
   TextLayerBuilder,
@@ -45,7 +47,7 @@ GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
   const pdf = await getDocument({
     // url: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf",
-    url: "http://localhost:9110/web/compressed.tracemonkey-pldi-09.pdf",
+    url: "/compressed.tracemonkey-pldi-09.pdf",
     useWorkerFetch: false,
   }).promise;
   console.log(`🚀 // DEBUG 🍔  ~ file: index.ts:49 ~ `, pdf.annotationStorage);
@@ -64,13 +66,15 @@ GlobalWorkerOptions.workerSrc = pdfjsWorker;
   // await textLayer.render({ viewport: pageProxy.getViewport({ scale: 1 }) });
   // await textLayer.show();
   // document.body.appendChild(textLayer.div);
-  const { pdfViewer, linkService, eventBus } = getViewer();
+  const { pdfViewer, linkService, eventBus, getAnnotationEditorUIManager } =
+    getViewer();
   pdfViewer.setDocument(pdf);
   linkService.setDocument(pdf, null);
 
   // Update page counter
   eventBus.on("pagesinit", () => {
     document.getElementById("page-count").textContent = pdf.numPages;
+    document.getElementById("scale").textContent = pdfViewer.currentScale;
   });
   document.getElementById("page-num").textContent = pdfViewer.currentPageNumber;
   eventBus.on("pagechanging", (e) => {
@@ -87,11 +91,13 @@ GlobalWorkerOptions.workerSrc = pdfjsWorker;
   });
 
   document.getElementById("zoom-in")!.addEventListener("click", () => {
-    pdfViewer.currentScale *= 1.2;
+    pdfViewer.currentScale += 0.25;
+    document.getElementById("scale").textContent = pdfViewer.currentScale;
   });
 
   document.getElementById("zoom-out")!.addEventListener("click", () => {
-    pdfViewer.currentScale /= 1.2;
+    pdfViewer.currentScale -= 0.25;
+    document.getElementById("scale").textContent = pdfViewer.currentScale;
   });
 
   document.getElementById("highlight")!.addEventListener("click", () => {
@@ -101,8 +107,14 @@ GlobalWorkerOptions.workerSrc = pdfjsWorker;
       AnnotationEditorType.HIGHLIGHT
     );
 
+    // pdfViewer.annotationEditorMode = {
+    //   ...pdfViewer.annotationEditorMode,
+    //   mode:
+    //     pdfViewer.annotationEditorMode === AnnotationEditorType.HIGHLIGHT
+    //       ? AnnotationEditorType.NONE
+    //       : AnnotationEditorType.HIGHLIGHT,
+    // };
     pdfViewer.annotationEditorMode = {
-      ...pdfViewer.annotationEditorMode,
       mode:
         pdfViewer.annotationEditorMode === AnnotationEditorType.HIGHLIGHT
           ? AnnotationEditorType.NONE
@@ -129,6 +141,57 @@ GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
     pdf.annotationStorage.setValue("test", annotation);
     // pdf.annotationStorage.updateEditor('test')
+  });
+
+  document.getElementById("popup")!.addEventListener("click", () => {
+    pdfViewer.annotationEditorMode = {
+      mode: AnnotationEditorType.POPUP,
+    };
+    console.log(
+      `🚀 // DEBUG 🍔  ~ file: index.ts:149 ~ `,
+      pdfViewer.annotationEditorMode
+    );
+  });
+  document.getElementById("text")!.addEventListener("click", () => {
+    pdfViewer.annotationEditorMode = {
+      mode: AnnotationEditorType.FREETEXT,
+    };
+    console.log(
+      `🚀 // DEBUG 🍔  ~ file: index.ts:159 ~ `,
+      pdfViewer.annotationEditorMode
+    );
+  });
+  document.getElementById("draw")!.addEventListener("click", () => {
+    pdfViewer.annotationEditorMode = {
+      mode: AnnotationEditorType.INK,
+    };
+    console.log(
+      `🚀 // DEBUG 🍔  ~ file: index.ts:159 ~ `,
+      pdfViewer.annotationEditorMode
+    );
+  });
+  document.getElementById("undo")!.addEventListener("click", () => {
+    const manager = getAnnotationEditorUIManager();
+
+    if (manager) {
+      manager.undo();
+    }
+  });
+  document.getElementById("redo")!.addEventListener("click", () => {
+    const manager = getAnnotationEditorUIManager();
+
+    if (manager) {
+      manager.redo();
+    }
+  });
+  document.getElementById("redo")!.addEventListener("click", () => {
+    const manager = getAnnotationEditorUIManager();
+    if (manager) {
+      // manager.editor
+      pdfViewer.annotationEditorMode = {
+        mode: AnnotationEditorType.DISABLE,
+      };
+    }
   });
 
   document.getElementById("save")!.addEventListener(
@@ -491,14 +554,44 @@ function getViewer() {
     findController: new PDFFindController({ eventBus, linkService }),
     //   annotationLayerFactory: new DefaultAnnotationLayerFactory(),
     // textLayerFactory: new DefaultTextLayerFactory(),
-    removePageBorders: true,
+    removePageBorders: false,
     // annotationEditorMode: AnnotationEditorType.HIGHLIGHT,
     annotationMode: AnnotationMode.ENABLE,
+    annotationEditorHighlightColors:
+      "yellow=#FFFF98,green=#53FFBC,blue=#80EBFF,pink=#FFCBE6,red=#FF4F5F,yellow_HCM=#FFFFCC,green_HCM=#53FFBC,blue_HCM=#80EBFF,pink_HCM=#F6B8FF,red_HCM=#C50043",
   });
   linkService.setViewer(pdfViewer);
+  // new AnnotationEditorLayer({
+  //   uiManager: new AnnotationEditorUIManager({}),
+  //   div,
+  //   mode,
+  //   structTreeLayer
+  // })
+
+  let _annotationEditorManager: AnnotationEditorUIManager | null = null;
+  pdfViewer.eventBus.on("annotationeditoruimanager", () => {
+    _annotationEditorManager = (pdfViewer._layerProperties as LayerProperties)
+      ?.annotationEditorUIManager;
+  });
+  const getAnnotationEditorUIManager = () => {
+    return _annotationEditorManager as AnnotationEditorUIManager | null;
+  };
   return {
     pdfViewer,
     linkService,
     eventBus,
+    getAnnotationEditorUIManager,
   };
+}
+
+interface LayerProperties {
+  annotationEditorUIManager: AnnotationEditorUIManager;
+  annotationStorage: any;
+  downloadManager: any;
+  enableComment: any;
+  enableScripting: any;
+  fieldObjectsPromise: any;
+  findController: any;
+  hasJSActionsPromise: any;
+  linkService: any;
 }
