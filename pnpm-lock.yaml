@@ -8,11 +8,14 @@ importers:
 
   .:
     dependencies:
+      '@digital-blueprint/annotpdf':
+        specifier: 1.0.13-a
+        version: 1.0.13-a
       pdf-lib:
         specifier: ^1.17.1
         version: 1.17.1
       pdfjs-dist:
-        specifier: ^5.4.296
+        specifier: 5.4.296
         version: 5.4.296
       typescript:
         specifier: ^5.9.3
@@ -22,6 +25,9 @@ importers:
         version: 7.1.11
 
 packages:
+
+  '@digital-blueprint/annotpdf@1.0.13-a':
+    resolution: {integrity: sha512-Nr/YcOYswe5XZG9NnjBVOa+tz5uNcQD1vg41pirbW7/zsnu0W48xjcCIpf46PkWsjAf+NxBRQB+i8gx/n0iQIg==}
 
   '@esbuild/aix-ppc64@0.25.11':
     resolution: {integrity: sha512-Xt1dOL13m8u0WE8iplx9Ibbm+hFAO0GsU2P34UNoDGvZYkY8ifSiy6Zuc1lYxfG7svWE2fzqCUmFp5HCn51gJg==}
@@ -359,8 +365,17 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@types/crypto-js@4.2.2':
+    resolution: {integrity: sha512-sDOLlVbHhXpAUAL0YHDUUwDZf3iN4Bwi4W6a0W0b+QcAezUbRtH4FVb+9J4h+XFPW7l/gQ9F8qC7P+Ec4k8QVQ==}
+
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
+
+  '@types/pako@1.0.7':
+    resolution: {integrity: sha512-YBtzT2ztNF6R/9+UXj2wTGFnC9NklAnASt3sC0h2m1bbH7G6FyBIkt4AN8ThZpNfxUo1b2iMVO0UawiJymEt8A==}
+
+  crypto-js@4.2.0:
+    resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
 
   esbuild@0.25.11:
     resolution: {integrity: sha512-KohQwyzrKTQmhXDW1PjCv3Tyspn9n5GcY2RTDqeORIdIJY8yKIF7sTSopFmn/wpMPW4rdPXI0UE5LJLuq3bx0Q==}
@@ -469,6 +484,13 @@ packages:
         optional: true
 
 snapshots:
+
+  '@digital-blueprint/annotpdf@1.0.13-a':
+    dependencies:
+      '@types/crypto-js': 4.2.2
+      '@types/pako': 1.0.7
+      crypto-js: 4.2.0
+      pako: 1.0.11
 
   '@esbuild/aix-ppc64@0.25.11':
     optional: true
@@ -666,7 +688,13 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.52.5':
     optional: true
 
+  '@types/crypto-js@4.2.2': {}
+
   '@types/estree@1.0.8': {}
+
+  '@types/pako@1.0.7': {}
+
+  crypto-js@4.2.0: {}
 
   esbuild@0.25.11:
     optionalDependencies:

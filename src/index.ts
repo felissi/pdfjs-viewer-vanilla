@@ -19,9 +19,11 @@ import {
   PDFHistory,
   PDFScriptingManager,
 } from "pdfjs-dist/web/pdf_viewer.mjs";
+// import {} from "pdfjs-dist/display/editor/";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
 
 import { PDFDocument, rgb } from "pdf-lib";
+import { AnnotationFactory } from "@digital-blueprint/annotpdf";
 
 import "pdfjs-dist/build/pdf.mjs";
 // import "pdfjs-dist/web/pdf_viewer.mjs";
@@ -47,7 +49,7 @@ GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
   const pdf = await getDocument({
     // url: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf",
-    url: "/compressed.tracemonkey-pldi-09.pdf",
+    url: "test-anno_(3).pdf",
     useWorkerFetch: false,
   }).promise;
   console.log(`🚀 // DEBUG 🍔  ~ file: index.ts:49 ~ `, pdf.annotationStorage);
@@ -184,34 +186,157 @@ GlobalWorkerOptions.workerSrc = pdfjsWorker;
       manager.redo();
     }
   });
-  document.getElementById("redo")!.addEventListener("click", () => {
-    const manager = getAnnotationEditorUIManager();
-    if (manager) {
-      // manager.editor
-      pdfViewer.annotationEditorMode = {
-        mode: AnnotationEditorType.DISABLE,
-      };
-    }
-  });
 
   document.getElementById("save")!.addEventListener(
     "click",
     () => {
       pdf.saveDocument().then((_) => {
-        const blob = new Blob([_], { type: "application/pdf" });
+        const blob = new Blob([_.buffer], { type: "application/pdf" });
         const a = document.createElement("a");
         const link = URL.createObjectURL(blob);
         a.href = link;
         a.download = "test.pdf";
         a.click();
         setTimeout(() => {
-          URL.revokeObjectURL(blob);
+          URL.revokeObjectURL(link);
           a.remove();
         });
       });
     },
     { passive: true }
   );
+  document.getElementById("show")!.addEventListener("click", () => {
+    pdfViewer.annotationEditorMode =
+      pdfViewer.annotationEditorMode?.mode === AnnotationEditorType.NONE
+        ? { mode: AnnotationEditorType.DISABLE }
+        : { mode: AnnotationEditorType.NONE };
+  });
+
+  const pdfFactory = new AnnotationFactory(await pdf.getData());
+  pdfFactory.createHighlightAnnotation(
+    // pdfViewer.currentPageNumber - 1,
+    0,
+    [0, 0, 60, 20],
+    "TEST_CONTENT",
+    "TEST_AUTHOR"
+  );
+  pdfFactory.createInkAnnotation(
+    0,
+    [
+      56.270358234643936, 454.1388351917267, 252.45674934983253,
+      568.0152096748352,
+    ],
+    "",
+    "",
+    [
+      61.125003814697266, 526.5, 72.375, 537.75, 76.125, 540.75, 83.625, 546.75,
+      88.87500762939453, 550.5, 94.875, 555, 100.125, 558, 105.375, 561,
+      109.875, 563.25, 113.625, 564.75, 116.625, 564.75, 117.37499237060547,
+      555, 117.37499237060547, 548.25, 117.37499237060547, 544.5, 115.875, 537,
+      114.375, 531.75, 112.12500762939453, 525.75, 109.875, 521.25, 107.625,
+      513.75, 105.375, 508.5, 103.12500762939453, 504.75, 101.625, 502.5,
+      122.625, 522, 127.875, 525.75, 133.875, 528.75, 146.625, 535.5, 151.125,
+      537, 155.62498474121094, 539.25, 160.125, 540.75, 163.12498474121094,
+      540.75, 168.375, 540.75, 170.625, 540, 171.37498474121094, 533.25,
+      171.37498474121094, 528.75, 171.37498474121094, 524.25,
+      171.37498474121094, 521.25, 170.625, 518.25, 169.875, 516, 168.375, 513,
+      167.625, 510.75, 165.37498474121094, 507.75, 178.125, 514.5, 184.125,
+      516.75, 186.375, 517.5, 193.125, 519, 196.87501525878906, 519.75, 199.875,
+      519.75, 202.125, 519.75, 205.12501525878906, 518.25, 207.37498474121094,
+      512.25, 208.875, 504, 208.875, 499.5, 208.875, 496.5, 208.875, 486.75,
+      208.875, 482.25, 208.125, 478.5, 207.37498474121094, 467.25,
+      207.37498474121094, 464.25, 207.37498474121094, 461.25,
+      207.37498474121094, 459, 208.125, 456.75, 215.62498474121094, 457.5,
+      220.875, 459, 228.375, 460.5, 232.875, 460.5, 238.125, 461.25, 243.375,
+      462, 247.87498474121094, 462, 250.125, 462, 251.625, 462,
+    ],
+    { r: 255, g: 255, b: 152 }
+  );
+
+  pdfFactory.annotations.at(-1).border.border_width = 24;
+  pdfFactory.annotations.at(-1).opacity = 0.45;
+  // ??????????????????
+  pdfViewer.annotationEditorMode = {
+    mode: AnnotationEditorType.HIGHLIGHT,
+  };
+
+  pdfFactory.createHighlightAnnotation(
+    0,
+    [
+      316.3428018093109, 405.58320584893227, 556.9812079668045,
+      427.759206533432,
+    ],
+    "",
+    "",
+    { r: 128, g: 235, b: 255 },
+    [
+      472.4208984375, 426.890625, 556.3317260742188, 426.890625, 472.4208984375,
+      416.390625, 556.3317260742188, 416.390625, 317.015625, 416.90625,
+      358.156494140625, 416.90625, 317.015625, 406.40625, 358.156494140625,
+      406.40625,
+    ]
+  );
+  pdfFactory.createFreeTextAnnotation(
+    0,
+    [79.12500000000001, 663.02734375, 136.6875, 683.5],
+    "TEXT-2012",
+    ""
+  );
+  pdfFactory.createTextAnnotation(
+    0,
+    [79.12500000000001, 663.02734375, 136.6875, 683.5],
+    "Pop up note",
+    ""
+  );
+  const pdf3 = await getDocument({ data: pdfFactory.write() }).promise;
+  pdfViewer.setDocument(pdf3);
+  const pdf3AnnotationEditorLayer = {
+    get value() {
+      return (pdfViewer._layerProperties as LayerProperties)
+        ?.annotationEditorUIManager?.currentLayer as
+        | AnnotationEditorLayer
+        | undefined;
+    },
+  };
+  console.log(
+    `🚀 // DEBUG 🍔  ~ file: index.ts:259 ~ `,
+    pdfViewer,
+    pdfViewer._layerProperties,
+    pdf3.annotationStorage,
+    "editor layer",
+    pdf3AnnotationEditorLayer
+  );
+  pdfViewer.eventBus.on("pagechanging", () => {
+    const myHighlightEditor =
+      pdf3AnnotationEditorLayer.value?.createAndAddNewEditor(
+        { x: 678, y: 379 } as PointerEvent,
+        false,
+        {
+          highlightId: 5,
+          highlightOutlines: {
+            firstPoint: [0.6699935793876648, 0.35147547721862793],
+            lastPoint: [0.7538217306137085, 0.4294990301132202],
+          },
+          clipPathId: "url(#clip_path_p1_5)",
+          methodOfCreation: "main_toolbar",
+        }
+      );
+    console.log(
+      `🚀 // DEBUG 🍔  ~ file: index.ts:317 ~ `,
+      pdf3AnnotationEditorLayer.value,
+      myHighlightEditor
+    );
+  });
+
+  document.getElementById("save-anno")!.addEventListener("click", async () => {
+    const blob = new Blob([await pdf3.saveDocument()], {
+      type: "application/pdf",
+    });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "test-anno.pdf";
+    a.click() && URL.revokeObjectURL(a.href);
+  });
 
   eventBus.dispatch("find", { type: "", query: "Just" });
 })();
@@ -555,7 +680,7 @@ function getViewer() {
     //   annotationLayerFactory: new DefaultAnnotationLayerFactory(),
     // textLayerFactory: new DefaultTextLayerFactory(),
     removePageBorders: false,
-    // annotationEditorMode: AnnotationEditorType.HIGHLIGHT,
+    annotationEditorMode: AnnotationEditorType.NONE,
     annotationMode: AnnotationMode.ENABLE,
     annotationEditorHighlightColors:
       "yellow=#FFFF98,green=#53FFBC,blue=#80EBFF,pink=#FFCBE6,red=#FF4F5F,yellow_HCM=#FFFFCC,green_HCM=#53FFBC,blue_HCM=#80EBFF,pink_HCM=#F6B8FF,red_HCM=#C50043",
